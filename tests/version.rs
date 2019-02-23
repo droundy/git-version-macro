@@ -1,4 +1,4 @@
-git_version::declare!(my_version);
+git_version_macro::declare!(my_version);
 
 #[test]
 fn is_right() {
