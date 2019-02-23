@@ -8,9 +8,6 @@ use std::path::Path;
 #[proc_macro]
 pub fn declare(input: TokenStream) -> TokenStream {
     let identifier = proc_macro2::TokenStream::from(input);
-    if !Path::new(".git").exists() {
-        println!("I don't see .git...");
-    }
     let cwd = std::env::current_dir().unwrap();
     let head = cwd.join(".git/HEAD").to_str().unwrap().to_string();
     let mut interesting_files = vec![head];
@@ -35,7 +32,7 @@ pub fn declare(input: TokenStream) -> TokenStream {
             #name
         };
     };
-    println!("tokens are {}", x);
+    // println!("tokens are {}", x);
     x.into()
 }
 
