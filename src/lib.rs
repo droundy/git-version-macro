@@ -20,16 +20,19 @@ pub fn declare(input: TokenStream) -> TokenStream {
             interesting_files.push(cwd.join(entry.path()).to_str().unwrap().to_string());
         }
     }
+    let vec = std::process::Command::new("git")
+            .args(&["describe", "--always"])
+            .output()
+        .expect("failed to execute git").stdout;
+    let name = std::str::from_utf8(&vec[..vec.len()-1]).expect("non-utf8 error?!");
     let x = quote!{
         fn __unused_by_git_version() {
             // This is included simply to cause cargo to rebuild when
             // a new commit is made.
             #( include_str!(#interesting_files); )*
-            // let _head = include_str!(#head);
         }
         const #identifier: &'static str = {
-            // let _master = include_str!(".git/refs/heads/master");
-            "foo"
+            #name
         };
     };
     println!("tokens are {}", x);
