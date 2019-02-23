@@ -1,1 +1,1 @@
-git_version::declare!(MY_VERSION);
+git_version::declare!(my_version);
