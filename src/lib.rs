@@ -36,6 +36,56 @@ pub fn declare(input: TokenStream) -> TokenStream {
     x.into()
 }
 
+#[proc_macro]
+pub fn git_describe(input: TokenStream) -> TokenStream {
+    let mut args = Vec::new();
+    let mut next_arg = String::new();
+    for t in input.into_iter() {
+        let x = t.to_string();
+        let last_char = next_arg.clone().pop(); // yes, this is terribly wasteful...
+        if next_arg.len() > 0 && next_arg != "-" && next_arg != "--" && x == "-"
+            && last_char != Some('=')
+        {
+            args.push(next_arg.clone());
+            next_arg = String::new();
+        }
+        next_arg.extend(x.chars());
+    }
+    if next_arg.len() > 0 {
+        args.push(next_arg);
+    }
+    let cwd = std::env::current_dir().unwrap();
+    let head = cwd.join(".git/HEAD").to_str().unwrap().to_string();
+    let mut interesting_files = vec![head];
+    let refs = Path::new(".git/refs/heads");
+    for entry in refs.read_dir().expect("read_dir call failed") {
+        if let Ok(entry) = entry {
+            interesting_files.push(cwd.join(entry.path()).to_str().unwrap().to_string());
+        }
+    }
+    let mut cmd = std::process::Command::new("git");
+    cmd.args(&["describe", "--always"]);
+    for a in args.iter() {
+        cmd.arg(&a);
+    }
+    let vec = cmd.output().expect("failed to execute git").stdout;
+    if vec.len() == 0 {
+        panic!("the command {:?} exited without returning a description", cmd);
+    }
+    let name = std::str::from_utf8(&vec[..vec.len()-1]).expect("non-utf8 error?!");
+    let x = quote!{
+        fn __unused_by_git_version_two() {
+            // This is included simply to cause cargo to rebuild when
+            // a new commit is made.
+            #( include_str!(#interesting_files); )*
+        }
+        const GIT_VERSION: &'static str = {
+            #name
+        };
+    };
+    x.into()
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
