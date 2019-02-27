@@ -1,16 +1,3 @@
-[package]
-name = "git-version-macro"
-version = "0.0.1"
-authors = ["David Roundy <daveroundy@gmail.com>"]
-edition = "2018"
-description = "Macro for finding the git version of the code."
-repository = "https://github.com/droundy/git-version"
-keywords = ["git"]
-license = "Apache-2.0/MIT"
+[workspace]
 
-[lib]
-proc-macro = true
-
-[dependencies]
-quote = "0.6"
-proc-macro2 = "0.4.24"
+members = ["git-version-macro", "git-version-macro-internal"]

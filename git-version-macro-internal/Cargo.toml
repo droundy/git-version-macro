@@ -1,0 +1,17 @@
+[package]
+name = "git-version-macro-internal"
+version = "0.0.1"
+authors = ["David Roundy <daveroundy@gmail.com>"]
+edition = "2018"
+description = "Macro for finding the git version of the code."
+repository = "https://github.com/droundy/git-version"
+keywords = ["git"]
+license = "Apache-2.0/MIT"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+quote = "0.6"
+proc-macro2 = "0.4.24"
+proc-macro-hack = "0.5"

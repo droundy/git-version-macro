@@ -2,8 +2,8 @@ extern crate proc_macro;
 
 use proc_macro::{ TokenStream };
 use quote::{ quote };
-
 use std::path::Path;
+use proc_macro_hack::proc_macro_hack;
 
 #[proc_macro]
 pub fn declare(input: TokenStream) -> TokenStream {
@@ -36,7 +36,10 @@ pub fn declare(input: TokenStream) -> TokenStream {
     x.into()
 }
 
-#[proc_macro]
+/// Use the given template to create a string.
+///
+/// You can think of this as being kind of like `format!` on strange drugs.
+#[proc_macro_hack]
 pub fn git_describe(input: TokenStream) -> TokenStream {
     let mut args = Vec::new();
     let mut next_arg = String::new();
@@ -74,14 +77,12 @@ pub fn git_describe(input: TokenStream) -> TokenStream {
     }
     let name = std::str::from_utf8(&vec[..vec.len()-1]).expect("non-utf8 error?!");
     let x = quote!{
-        fn __unused_by_git_version_two() {
+        {
             // This is included simply to cause cargo to rebuild when
             // a new commit is made.
             #( include_str!(#interesting_files); )*
-        }
-        const GIT_VERSION: &'static str = {
             #name
-        };
+        }
     };
     x.into()
 }
