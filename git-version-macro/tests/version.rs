@@ -10,6 +10,8 @@ fn is_right() {
     assert_eq!(my_version, name);
 }
 
+use git_version_macro::git_describe;
+
 #[test]
 fn git_version_is_right() {
     let vec = std::process::Command::new("git")
@@ -18,6 +20,6 @@ fn git_version_is_right() {
         .expect("failed to execute git").stdout;
     let name = std::str::from_utf8(&vec[..vec.len()-1]).expect("non-utf8 error?!");
     println!("name = {}", name);
-    println!("GIT_VERSION = {}", git_version_macro::git_describe!(--dirty=-modified));
-    assert_eq!(git_version_macro::git_describe!(--dirty=-modified), name);
+    println!("GIT_VERSION = {}", git_describe!(--dirty=-modified));
+    assert_eq!(git_describe!(--dirty=-modified), name);
 }
